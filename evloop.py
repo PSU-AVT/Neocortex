@@ -30,7 +30,7 @@ class EventDispatcher(object):
 		while True:
 			self.loop()
 
-	def loop(self, timeout=100):
+	def loop(self, timeout=10):
 		events = self._poll.poll(timeout)
 		for event in events:
 			try:
@@ -65,8 +65,8 @@ class FdWatcher(object):
 
 	def setup_fd(self, fd, eventmask):
 		try:
+			'Check if we have an old fd to remove'
 			if self._fd != fd:
-				'Remove the old fd'
 				self.dispatcher.remove_fd(self._fd)
 		except AttributeError:
 			pass

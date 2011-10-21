@@ -7,9 +7,14 @@ import evloop
 class ControlGw(evloop.FdWatcher):
 	def __init__(self, host, port, controller):
 		evloop.FdWatcher.__init__(self)
+
+		self.controller = controller
+
+		# Create and bind socket
 		self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		self.socket.bind((host, port)) 
-		self.controller = controller
+
+		# Setup monitoring for read
 		self.setup_fd(self.socket, 0)
 		self.set_readable()
 
