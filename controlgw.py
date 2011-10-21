@@ -1,25 +1,23 @@
 import socket
-import asyncore
 import struct
 
 import afproto
+import evloop
 
-class ControlGw(asyncore.dispatcher):
+class ControlGw(evloop.FdWatcher):
 	def __init__(self, host, port, controller):
-		asyncore.dispatcher.__init__(self)
-		self.create_socket(socket.AF_INET, socket.SOCK_DGRAM)
-		self.set_reuse_addr()
-		self.bind((host, port)) 
+		evloop.FdWatcher.__init__(self)
+		self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+		self.socket.bind((host, port)) 
 		self.controller = controller
+		self.setup_fd(self.socket, 0)
+		self.set_readable()
 
-	def handle_read(self):
+	def handle_read(self, fd):
 		data, addr = self.recvfrom(2048)
 		cmd_id, arg = struct.unpack('BB', data)
 		self.controller.write(afproto.serialize_payload(data))
 
-	def writable(self):
-		return False
-
-	def handle_write(self):
+	def handle_write(self, fd):
 		pass
 
