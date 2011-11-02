@@ -21,11 +21,10 @@ class SerialAfprotoWatcher(evloop.FdWatcher):
 		self.out_buff += frame
 
 	def handle_write(self, fd):
-		ch = self.out_buff[0]
-		self.out_buff = self.out_buff[1:]
+		sent = self.device.write(self.out_buff)
+		self.out_buff = self.out_buff[sent:]
 		if len(self.out_buff) == 0:
 			self.set_writable(False)
-		self.device.write(ch)
 
 	def handle_read(self, fd):
 		self.in_buff += self.device.read(10)
